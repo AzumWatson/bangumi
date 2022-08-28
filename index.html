@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ajpx GET 请求</title>
+    <!-- <style>
+        #result{
+            width: 200px;
+            height: 100px;
+            border: solid 1px;
+        }
+    </style> -->
+</head>
+<body>
+    <button>星期一</button>
+    <button>星期二</button>
+    <button>星期三</button>
+    <button>星期四</button>
+    <button>星期五</button>
+    <button>星期六</button>
+    <button>星期日</button>
+    <div id="result"></div>
+    <script>
+        const result = document.querySelector('#result');
+        const button = document.querySelectorAll('button');
+
+        const xhr =  new XMLHttpRequest();
+
+        const date = new Date();
+        const day = date.getDay();
+        const days = [6,0,1,2,3,4,5]
+        let data;
+
+        //设置请求头
+        // xhr.setRequestHeader('Content-Type','application/x-www-form-urlencoded');
+
+        //超时设置
+        // xhr.timeout = 2000;
+        // //超时回调
+        // xhr.ontimeout = function(){
+        //     result.innerHTML = "网络超时请重试";
+        // }
+
+        
+        xhr.responseType = 'json';
+
+        xhr.onreadystatechange = ()=>{
+            if(xhr.readyState === 4){
+                if(xhr.status >= 200 && xhr.status < 300){
+                    data = xhr.response;
+                    button[days[day]].click();
+                }
+            }
+        }
+
+        xhr.open('GET','https://api.bgm.tv/calendar');
+        xhr.send();
+
+        for(let i=0;i<button.length;i++){
+            button[i].id = i+1;
+            button[i].onclick = bangumi;
+        }
+
+        function bangumi(){
+            let dayss = this.id;
+
+            // 排他法，没点击一次就将div标签清空
+            result.innerHTML = "";
+
+            // console.log(`点击了${dayss}`);
+            for(let k in data){
+                
+                let datas = data[k].items;
+
+                if(data[k].weekday.id == dayss){
+                    for(let kk in datas){
+                        const p = document.createElement('p');
+                        result.appendChild(p);
+
+                        // 判断中文名称是否为空 为空则是国创不显示
+                        if(datas[kk].name_cn != ''){
+                            p.innerHTML = (datas[kk].name_cn);
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+</body>
+</html>
